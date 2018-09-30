@@ -1,0 +1,214 @@
+
+                        ###############################
+                        #           README            #
+                        #                             #
+                        #  Nume Proiect: Greedy & DP  #
+                        #   Creat de: Apostol Teodor  #
+                        #        Grupa: 322CC         #
+                        #     Deadline: 14.04.2018    #
+                        #                             #
+                        ###############################
+
+
+
+    -------------------------------- Task 1 --------------------------------
+                        	     (Frati)
+                        	   --GREEDY--
+
+    	Am implementat rezolvarea aceste probleme in limbajul C++.
+    	La inceputul programului citesc din fisierul "frati.in" numarul de
+    concursuri si lista acestora pe care o salvez intr-un vector de "Concurs".
+    Concurs este o structura de date pe care am folosit-o pentru a memora premiile
+    fiecarui concurs.
+    	Dupa memorarea acestora in vector are loc sortarea ce se efectueaza cu
+    ajutorul functiei sort() din biblioteca <algorithm> si al functiei Comparator().
+    Sortarea are 2 reguli/prioritati: primele elemente vor fi cele cu suma premiilor
+    cele mai mari. In cazul in care doua elemente au aceeasi suma, se va trece la a
+    doua regula: concursurile cu mai multe jocuri oferite drept premiu vor fi pe
+    primele pozitii.
+    	Algoritmul este de tip GREEDY. La fiecare pas incercam sa obtinem optimul.
+    	Incepem parcurgerea vectorului de concursuri cu ajutorul unei bucle for.
+    	Se verifica cu GetEqualSeq() daca urmeaza o secventa de concursuri ce au
+    aceeasi suma a premiilor. Functia intoarce indexul pe care il primeste pentru
+    pornire in cazul in care nu urmeaza o astfel de secventa sau indexul ultimului
+    element din secventa.
+    	Daca nu urmeaza o secventa de acest tip, Jon va alege primul element din
+    vector, iar Sam pe al doilea si tot asa la fiecare iteratie.
+    	Presupunem ca am ajuns la iteratia x, unde avem elemente cu aceeasi suma, iar
+    parcurgerea este in urmatoarea stare curenta:
+
+    vectorul:
+    =====(------)---------
+
+    legenda:
+    =  : parcurse (concursurile ce au fost deja alese de catre cei doi frati)
+    () : secventa (delimitatori ai secventei de concursuri cu aceeasi suma a premiilor)
+
+    	Se verifica mai intai care frate urmeaza, cu ajutorul functiei UrmeazaJon(),
+    care intoarce true in cazul in care Jon urmeaza sa isi aleaga concursul sau false
+    in cazul in care Sam este urmatorul.
+    	Programul functioneaza similar pentru oricare dintre frati ar fi primul.
+    	Presupunem ca Sam este primul care alege:
+
+    	Cum stim ca vectorul este sortat dupa regula: Daca avem elemente cu aceeasi suma
+    ordonam descrescator dupa numarul de jocuri, Sam va dori sa prioritizeze concursurile
+    ce ii ofera mai multe obiecte preferate (Benzi desenate). Un mod de a vedea mai bine
+    lista:
+
+
+    Multe Jocuri, Putine Benzi desenate .............. Multe Benzi Desenate, Putine Jocuri
+
+    	Sam va parcurge secventa de la dreapta la stanga, pentru a obtine la fiecare pas
+    cat mai multe benzi desenate. 
+
+    =====(-----=)---------
+
+    	Jon va parcurge secventa de la stanga la dreapta, pentru a obtine la fiecare pas
+    cat mai multe jocuri.
+
+    =====(=----=)---------
+
+    	Si iterativ continuam:
+
+    =====(=---==)---------
+    =====(==--==)---------
+    =====(==-===)---------
+    =====(======)---------
+
+    	Pentru a verifica daca s-a ajuns la mijlocul listei, fiecare concurs ales va
+    avea numarul de jocuri egal cu 0 si numarul de benzi desenate egal cu 0. In momentul in
+    care unul din frati ajunge sa aleaga un astfel de concurs, el va stii ca fratele sau
+    l-a ales deja, deci secventa de concursuri a fost parcursa si se va trece mai departe
+    in bucla for, la urmatoarele concursuri din afara secventei.
+
+    =====(======)=--------
+    =====(======)==-------
+    =====(======)===------
+    =====(======)====-----
+
+    	Dupa ce s-a parcurs intreaga lista, cei doi frati au ales concursurile dupa
+    criteriile cerute.
+
+  		Complexitatea algoritmului este O(n log n).
+  		Sortarea are O(n log n)
+  		Fiecare element se parcurge o singura data.
+  		Elementele din cadrul unei secvente se parcurg de doua ori.
+  			- prima data pentru a determina numarul acestora
+  			- a doua oare pentru a fi alese de cei doi frati
+        Daca tot vectorul este o secventa de concursuri cu aceeasi suma, fiecare
+    element se va parcurge de doua ori => O(n log n) + O(2n) => O(n log n)
+
+
+    -------------------------------- Task 3 --------------------------------
+                                 (Planificare)
+                                     --DP--
+
+        In rezolvarea acestui task, am numerotat atat probele cat si indecsii acestora
+    de la 1 pana la numarProbe, pentru a fi mai clara implementarea.
+        Rezolvarea problemei am facut-o folosind programare dinamica, bazandu-mi
+    dinamica pe Problema Parantezarii optime de Matrice (PODM), prezentata in
+    laboratorul 4.
+        Matricea are urmatoarea forma: indexul liniei (il vom numi "i") reprezinta
+    proba de la care pornesc, iar indexul coloanei (il vom numi "j") reprezinta
+    proba la care ajung. dp[i][j], cu alte cuvinte, reprezinta pierderea minima
+    pentru planificarea tuturor probelor din intervalul [i, j].
+        Cazul de baza al rezolvarii consta in doua etape:
+        Matricea este initializata cu valoarea "infinit" adica LLONG_MAX.
+        1. Completarea diagonalei principale:
+            - Cum dp[i][j] reprezinta pierderea minima pentru planificarea tuturor
+            probelor [i...j], dp[i][i] va reprezenta pierderea minima pentru
+            planificarea probei i. Proba i va fi in "propriul ei concurs", deci
+            pierderea va fi: [durata concurs - durata proba i].
+        2. Umplerea unui singur concurs.
+            - Acum ca avem tratat cazul in care o proba se afla singura intr-un concurs,
+            vom incerca sa introducem cat mai multe probe intr-un singur concurs, plecand
+            de la diagonala principala (un singur concurs).
+            Ex: ajungem la linia 3: Pornim de la faptul ca proba 3 se afla intr-un singur
+            concurs. Adaugam proba 4 la concurs si verificam daca incape. in dp[3][3] se
+            afla valoarea mentionata anterior : [durata concurs - durata proba 3], deci
+            daca adaugam o proba tinem cont si de pauza:
+            [durata oncurs - durata proba 3 - pauza - durata proba 4] = dp[3][3] - durata 4.
+            Continuam similar, adaugand proba 5, 6.. etc pana cand timpul concursului nu mai
+            permite adaugarea altei probe consecutive [dferenta = 0]. Atunci ne oprim si
+            trecem la proba 4.
+        3. Stim ca ultima proba se va afla mereu in ultimul concurs. De asemenea stim ca
+            ultimul concurs are pierderea 0. Cu alte cuvinte proba va avea pierderea 0.
+            dp[n][n] = 0, dp[i][n] = 0. (atata timp cat probele i...n incap intr-un concurs.)
+        4. Dupa terminarea pasilor 1 - 3, calculam pierderea propriuzisa, adica toate cazurile
+            calculate anterior le transformam din [durata concurs - p1 - b - p2 ..] ->
+            [durata concurs - p1 - b - p2 ..]^3.
+
+        Recurenta probemei este aproape identica cu cea de la parantezarea matricelor cu o exceptie:
+        Luam toate modurile de a diviza problema curenta in doua subprobleme:
+        ex:
+        dp[1][5] se poate calcula ca:
+        dp[1][1] + dp[2][5] sau dp[1][2] + dp[3][5] sau dp[1][3] + dp[4][5] sau dp[1][4] + dp[5][5]
+        Adica exista un k, care va lua toate posibilitatile de a sparge problema.
+        Dintre cele 3 variante se va lua cea cu pierderea cea mai mica.
+        Recurenta este:  dp[i][j] = min {dp[i][k] + dp[k+1][j]}, unde k apartine [i, j-1].
+
+            Toate minimurile au fost facute pe long long.
+            Din punct de vedere al implementarii, am creat o structura pentru fiecare optim care
+        contine campurile minim (long long) = pierderea minima si concursuri (int) in cate
+        concursuri s-a calculat pierderea minima curenta.
+            Numarul de concursuri creste de fiecare data cand imbin doua subsolutii, pentru
+        pierderii minime:
+
+        dp[1, 6] = se afla intr-un numar de concursuri
+        dp[7, 10] = se afla intr-un alt numar de concursuri
+
+        Ca un exemplu:
+        probele 1, 2, 3 se afla in concursul c1. |
+        probele 4, 5    se afla in concursul c2. | => deci dp[1][6].concursuri = 3.
+        proba 6         se afla in concursul c3. |
+
+        probele 7, 8    se afla in concursul c4. | => deci dp[7][10].concursuri = 2.
+        probele 9, 10   se afla in concursul c5. |
+
+        Presupunem ca minimul pentru dp[1][10] = dp[1][6] + dp[7][10], deci numarul
+        de concursuri in care se incadreaza acest minim este suma dp[1][6] + dp[7][10] = 5.
+
+        Complexitatea temporala a algoritmului este O(n^3), exact ca la problema PODM.
+
+
+    -------------------------------- Task 4 --------------------------------
+                                 (Numaratoare)
+                                   
+        Algoritmul folosit pentru rezolvarea acestei probleme este un backtracking
+    optimizat.
+        Dupa ce se realizeaza citirea, se iau recursiv fiecare dintre cei n
+    termeni si se genereaza suma. In main se gestioneaza primul termen, plecand
+    de la valoarea cea ma mare posibila:
+    cazul: suma = termen1 + 1 + 1 + 1 + 1 + ... + 1
+        Dupa ce se gestioneaza toate posibilitatile (una singura in acest caz), primul
+    termen va fi decrementat pana la valoarea 1.
+        
+        Functia bktr() are urmatoarele argumente:
+        - sum               ->  vectorul de termeni
+        - suma_curenta      ->  suma obtinuta pana la termenul curent
+        - suma              ->  suma (pe care o formeaza termenii)
+        - isuma             ->  indexul sumei curente
+        - cautat            ->  indexul sumei cautate
+        - termen            ->  indexul termenului curent
+        - n                 ->  numarul de termeni ai sumei
+
+        Cazul de baza al acestei functii este ultimul element al sumei. Aceste este
+    calculat prin diferenta dintre suma si suma_curenta si daca este mai mic decat
+    elementele anterioare este adaugat la suma, altfel nu va fi adaugat (pentru ca se
+    pastreaza conditia de ordine descrescatoare a termenilor). Dupa ce elementul a fost
+    adaugat, se verifica daca suma gasite este cea cautata. In acest caz programul se
+    termina, altfel se continua cautarea.
+        La fiecare pas se incepe prin a verifica daca prin adaugarea de elemente unitare
+    pana la sfarsit se obtine o suma mai mare decat suma ce trebuie formata de aceste elemente
+    pentru a forma suma ceruta. In acest caz ne intoarcem pentru ca nu avem cum sa continuam
+    sa gasim suma.
+        Dupa verificare urmeaza parcurgerea propriuzisa a elementelor pana la intalnirea cazului
+    de baza. Pentru elementul curent se iau toate posibilitatile, stiind ca pentru a mentine
+    ordinea descrescatoare se alege elementul in intervalul [elementul_anterior, 1].
+        La fiecare iteratie (printre valorile posibile ale elementului curent) se verifica daca
+    nu cumva am depasit deja suma pe care incercam sa o construim. In acest caz ne intoarcem si
+    incercam alt set de valori pentru termenii anteriori.
+
+    Complexitatea temporala a algoritmului este O(n!).
+    Considerand cel mai defavorabil caz, cand se genereaza toate sumene si se afiseaza "-".
+    
